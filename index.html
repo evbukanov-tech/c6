@@ -4,7 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор</title>
+    <script>
+        (function () {
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.dataset.theme = saved || (prefersDark ? 'dark' : 'light');
+        })();
+    </script>
     <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --calc-bg: #ffffff;
+            --calc-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            --display-bg: #1a1a1a;
+            --display-text: #ffffff;
+            --btn-bg: #f0f0f0;
+            --btn-hover-bg: #e0e0e0;
+            --btn-text: #333333;
+            --btn-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            --btn-active-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            --operator-bg: #667eea;
+            --operator-hover: #5568d3;
+            --accent-text: #ffffff;
+            --equals-bg: #764ba2;
+            --equals-hover: #653a8a;
+            --clear-bg: #ff6b6b;
+            --clear-hover: #ee5a5a;
+            --theme-toggle-bg: rgba(0, 0, 0, 0.06);
+            --theme-toggle-hover: rgba(0, 0, 0, 0.12);
+        }
+
+        [data-theme="dark"] {
+            --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --calc-bg: #2d2d3a;
+            --calc-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            --display-bg: #0f0f12;
+            --display-text: #f0f0f0;
+            --btn-bg: #3d3d4a;
+            --btn-hover-bg: #4d4d5c;
+            --btn-text: #e8e8e8;
+            --btn-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            --btn-active-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+            --operator-bg: #5a6fd6;
+            --operator-hover: #4a5fc6;
+            --equals-bg: #8b5cb0;
+            --equals-hover: #7a4a9f;
+            --clear-bg: #e85555;
+            --clear-hover: #d64444;
+            --theme-toggle-bg: rgba(255, 255, 255, 0.1);
+            --theme-toggle-hover: rgba(255, 255, 255, 0.18);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -17,22 +67,57 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-gradient);
             padding: 20px;
+            transition: background 0.3s ease;
         }
 
         .calculator {
-            background: #ffffff;
+            background: var(--calc-bg);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--calc-shadow);
             padding: 30px;
             max-width: 400px;
             width: 100%;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .calculator-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .theme-toggle {
+            background: var(--theme-toggle-bg);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.2s;
+            padding: 0;
+            color: var(--btn-text);
+        }
+
+        .theme-toggle:hover {
+            background: var(--theme-toggle-hover);
+            transform: scale(1.05);
+            box-shadow: none;
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
+            box-shadow: none;
         }
 
         .display {
-            background: #1a1a1a;
-            color: #ffffff;
+            background: var(--display-bg);
+            color: var(--display-text);
             font-size: 2.5rem;
             padding: 20px;
             text-align: right;
@@ -44,6 +129,7 @@
             justify-content: flex-end;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .buttons {
@@ -53,7 +139,7 @@
         }
 
         button {
-            background: #f0f0f0;
+            background: var(--btn-bg);
             border: none;
             border-radius: 10px;
             font-size: 1.5rem;
@@ -61,45 +147,45 @@
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 600;
-            color: #333;
+            color: var(--btn-text);
         }
 
         button:hover {
-            background: #e0e0e0;
+            background: var(--btn-hover-bg);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--btn-shadow);
         }
 
         button:active {
             transform: translateY(0);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--btn-active-shadow);
         }
 
         .operator {
-            background: #667eea;
-            color: #ffffff;
+            background: var(--operator-bg);
+            color: var(--accent-text);
         }
 
         .operator:hover {
-            background: #5568d3;
+            background: var(--operator-hover);
         }
 
         .equals {
-            background: #764ba2;
-            color: #ffffff;
+            background: var(--equals-bg);
+            color: var(--accent-text);
         }
 
         .equals:hover {
-            background: #653a8a;
+            background: var(--equals-hover);
         }
 
         .clear {
-            background: #ff6b6b;
-            color: #ffffff;
+            background: var(--clear-bg);
+            color: var(--accent-text);
         }
 
         .clear:hover {
-            background: #ee5a5a;
+            background: var(--clear-hover);
         }
 
         .zero {
@@ -109,6 +195,9 @@
 </head>
 <body>
     <div class="calculator">
+        <div class="calculator-header">
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Переключить тему" title="Переключить тему">🌙</button>
+        </div>
         <div class="display" id="display">0</div>
         <div class="buttons">
             <button class="clear" onclick="clearDisplay()">C</button>
@@ -137,6 +226,28 @@
     </div>
 
     <script>
+        const themeToggle = document.getElementById('themeToggle');
+
+        function updateThemeIcon() {
+            const isDark = document.documentElement.dataset.theme === 'dark';
+            themeToggle.textContent = isDark ? '☀️' : '🌙';
+            themeToggle.setAttribute('aria-label', isDark ? 'Включить светлую тему' : 'Включить тёмную тему');
+            themeToggle.title = isDark ? 'Включить светлую тему' : 'Включить тёмную тему';
+        }
+
+        function setTheme(theme) {
+            document.documentElement.dataset.theme = theme;
+            localStorage.setItem('theme', theme);
+            updateThemeIcon();
+        }
+
+        themeToggle.addEventListener('click', function () {
+            const current = document.documentElement.dataset.theme;
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        updateThemeIcon();
+
         let display = document.getElementById('display');
         let currentInput = '0';
         let shouldResetDisplay = false;
